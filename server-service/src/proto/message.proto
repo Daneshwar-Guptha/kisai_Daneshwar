@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package UserMessage;
+
+message CmdMessage {
+  string message = 1;
+}
+
+service MessageService {
+  rpc getMessage (stream CmdMessage) returns (stream CmdMessage);
+}
