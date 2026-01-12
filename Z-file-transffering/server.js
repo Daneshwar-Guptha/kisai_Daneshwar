@@ -3,7 +3,7 @@ const protoLoader = require("@grpc/proto-loader");
 const fs = require("fs");
 const path = require("path");
 
-const PROTO_PATH = "./file_transfer.proto";
+const PROTO_PATH = path.join(__dirname,"./proto/file_transfer.proto")
 const CHUNK_SIZE = 64 * 1024; // 64KB
 
 const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
@@ -20,7 +20,7 @@ const proto = grpc.loadPackageDefinition(packageDefinition)
 function DownloadFile(call) {
   const fileName = call.request.file_name;
   const offset = Number(call.request.offset);
-  const filePath = path.join(__dirname, fileName);
+  const filePath = "C:/Users/K Daneshwar guptha/OneDrive/Desktop/JavaScript/Day2/practice.java";
 
   if (!fs.existsSync(filePath)) {
     call.emit("error", {
@@ -39,6 +39,7 @@ function DownloadFile(call) {
   });
 
   stream.on("data", (chunk) => {
+    console.log("client connected");
     call.write({
       data: chunk,
       chunk_number: chunkNumber++,
@@ -75,7 +76,7 @@ function main() {
     grpc.ServerCredentials.createInsecure(),
     () => {
       console.log("Server running on port 50051");
-      server.start();
+     
     }
   );
 }
