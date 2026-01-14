@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package message;
+
+option go_package = "grpc-go/proto;pb";
+
+message RequestMessage {
+  string name = 1;
+}
+
+message ResponseMessage {
+  string message = 1;
+}
+
+service MessageService {
+  rpc SayHello (RequestMessage) returns (ResponseMessage);
+}
