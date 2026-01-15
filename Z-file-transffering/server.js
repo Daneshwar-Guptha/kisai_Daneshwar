@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 const PROTO_PATH = path.join(__dirname, "proto/file_transfer.proto");
-const FILE_PATH = "C:/Users/K Daneshwar guptha/OneDrive/Desktop/JavaScript/Day2/practice.java";
+const FILE_PATH = "C:/Users/K Daneshwar guptha/OneDrive/Desktop/JavaScript/Day2/practice.java"; 
 const CHUNK_SIZE = 64 * 1024;
 
 const packageDef = protoLoader.loadSync(PROTO_PATH);
@@ -60,7 +60,7 @@ server.bindAsync(
   "0.0.0.0:50051",
   grpc.ServerCredentials.createInsecure(),
   () => {
-    server.start();
+    
     console.log("Server running on port 50051");
   }
 );

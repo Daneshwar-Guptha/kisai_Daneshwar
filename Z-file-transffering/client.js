@@ -19,7 +19,7 @@ function downloadFile(fileName, outputFile) {
     grpc.credentials.createInsecure()
   );
 
-  const call = client.DownloadFile({ file_name: fileName, offset });
+  const call = client.DownloadFile({ file_name: fileName, offset:0 });
   const writeStream = fs.createWriteStream(outputFile, { flags: "a" });
 
   call.on("data", (chunk) => {
@@ -37,4 +37,4 @@ function downloadFile(fileName, outputFile) {
   });
 }
 
-downloadFile("practice.java", "downloaded_practice.java");
+downloadFile("practice.java", "fileTransfer.txt");

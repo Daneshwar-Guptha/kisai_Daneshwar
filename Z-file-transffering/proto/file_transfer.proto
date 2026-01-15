@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package filetransfer;
 
+
 service FileTransferService {
   rpc DownloadFile (FileRequest) returns (stream FileChunk);
 }
