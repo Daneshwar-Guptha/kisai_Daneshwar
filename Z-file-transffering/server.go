@@ -20,7 +20,7 @@ func (s *server) DownloadFile(
 	stream pb.FileTransferService_DownloadFileServer,
 ) error {
 
-	filePath := "/mnt/c/Users/kdaneshwar/Documents/grpc-demo1/Demo/hello.proto"
+	filePath := "C:/Users/K Daneshwar guptha/OneDrive/Desktop/JavaScript/Day2/practice.java"
 
 	
 	data, err := os.ReadFile(filePath)

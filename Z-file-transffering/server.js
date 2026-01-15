@@ -15,7 +15,12 @@ const packageDef = protoLoader.loadSync(PROTO_PATH,{
 const proto = grpc.loadPackageDefinition(packageDef).filetransfer;
 
 function DownloadFile(call) {
-  const offset = Number(call.request.offset);
+
+  let offset = 0;
+  if (call.request.offset !== undefined && call.request.offset !== null) {
+    offset = parseInt(call.request.offset, 10);
+  }
+ 
 
   if (!fs.existsSync(FILE_PATH)) {
     call.emit("error", {
