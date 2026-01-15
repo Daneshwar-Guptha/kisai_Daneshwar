@@ -13,19 +13,16 @@ import (
 )
 
 const (
-	SERVER_ADDRESS = "localhost:50051"
-	CHUNK_SIZE     = 64 * 1024         
+	SERVER_ADDRESS = "192.168.0.229:50051"
 )
 
 func downloadFile(fileName string, outputFile string) error {
-	
 	offset := int64(0)
 	if info, err := os.Stat(outputFile); err == nil {
 		offset = info.Size()
 		fmt.Printf("Resuming download from byte %d\n", offset)
 	}
 
-	
 	conn, err := grpc.Dial(SERVER_ADDRESS, grpc.WithInsecure())
 	if err != nil {
 		return fmt.Errorf("failed to connect: %v", err)
@@ -34,7 +31,6 @@ func downloadFile(fileName string, outputFile string) error {
 
 	client := pb.NewFileTransferServiceClient(conn)
 
-	
 	ctx, cancel := context.WithTimeout(context.Background(), time.Hour)
 	defer cancel()
 
@@ -46,18 +42,16 @@ func downloadFile(fileName string, outputFile string) error {
 		return fmt.Errorf("failed to call DownloadFile: %v", err)
 	}
 
-	
 	file, err := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		return fmt.Errorf("failed to open file: %v", err)
 	}
 	defer file.Close()
 
-	
 	for {
 		chunk, err := stream.Recv()
 		if err == io.EOF {
-			fmt.Println(" Download completed")
+			fmt.Println("Download completed")
 			break
 		}
 		if err != nil {
@@ -69,7 +63,7 @@ func downloadFile(fileName string, outputFile string) error {
 		}
 
 		if chunk.Eof {
-			fmt.Println(" download successful")
+			fmt.Println("Download successful")
 			break
 		}
 	}
@@ -78,7 +72,7 @@ func downloadFile(fileName string, outputFile string) error {
 }
 
 func main() {
-	fileName := "/mnt/c/Users/kdaneshwar/Documents/grpc-demo1/Demo/hello.proto" 
+	fileName := "/mnt/c/Users/kdaneshwar/Documents/grpc-demo1/Demo/hello.proto"
 	outputFile := "fileTransfer.txt"
 
 	if err := downloadFile(fileName, outputFile); err != nil {

@@ -1,9 +1,7 @@
 syntax = "proto3";
 
 package filetransfer;
-option go_package = "/proto";
-
-
+option go_package = "github.com/kdaneshwar/z-file-transferring/proto";
 
 service FileTransferService {
   rpc DownloadFile (FileRequest) returns (stream FileChunk);
