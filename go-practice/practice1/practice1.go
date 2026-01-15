@@ -1,14 +1,23 @@
 package main
 
-import "fmt";
+import (
+	"fmt"
+	"os"
+)
 
 
-func main  ()  {
-	var name1 = "guptha"
-	var name2 string
-	fmt.Println(name1);
-	fmt .Println(&name1)
-	fmt.Println("hello world");
-	fmt.Scan(name2)
-	fmt.Println(name2);
+
+
+func main() {
+
+  data ,err := os.ReadFile("/mnt/c/Users/kdaneshwar/Downloads/grpc client/grpc client/src/chat.proto")
+  if err!=nil{
+	fmt.Println("error",err)
+
+  }
+  fmt.Print(string(data))
+
+	
 }
+
+
