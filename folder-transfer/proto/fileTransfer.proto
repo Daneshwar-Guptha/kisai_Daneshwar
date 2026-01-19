@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package filetransfer;
+
+//option go_package = "proto/filetransfer";
+
+service FileTransferService {
+  rpc DownloadFolder(FolderRequest) returns (stream FileChunk);
+}
+
+message FolderRequest {
+  string folder_path = 1;
+  repeated FileProgress progress = 2;
+}
+
+message FileProgress {
+  string file_path = 1;
+  int64 offset = 2;
+}
+
+message FileChunk {
+  string file_path = 1;
+  int64 offset = 2;
+  bytes data = 3;
+  bool eof = 4;
+}
