@@ -5,14 +5,17 @@ const path = require("path");
 
 const PROTO_PATH = path.join(__dirname, "proto/fileTransfer.proto");
 
-const FILE_PATH = "C:/Users/kdaneshwar/Documents/random_files";
+const folder_path = "/mnt/c/Users/kdaneshwar/Documents/random_files";
 
-if(fs.existsSync(FILE_PATH)){
+if(fs.existsSync(folder_path)){
   console.log("folder was existed")
 }
 else{
   console.log("folder was not exusted");
 }
+fs.readdir(folder_path,(file,error)=>{
+  console.log(error)
+})
 
 const CHUNK_SIZE = 64 * 1024;
 

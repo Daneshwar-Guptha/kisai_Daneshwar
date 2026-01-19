@@ -6,8 +6,8 @@ from proto import file_transfer_pb2_grpc
 
 
 
-SERVER_ADDRESS = "192.168.0.229:50051"
-OUTPUT_FILE = "fileTransfer.txt"
+SERVER_ADDRESS = "10.105.54.157:50051"
+OUTPUT_FILE = "./files-2gb/file1.txt"
 
 
 def download_file(file_name):
@@ -17,17 +17,14 @@ def download_file(file_name):
         offset = os.path.getsize(OUTPUT_FILE)
         print("Resuming from byte:", offset)
 
-   
+    count = (offset)/(3*1024*1024)
     channel = grpc.insecure_channel(SERVER_ADDRESS)
 
    
     client = file_transfer_pb2_grpc.FileTransferServiceStub(channel)
 
    
-    request = file_transfer_pb2.FileRequest(
-        file_name=file_name,
-        offset=offset
-    )
+    request = file_transfer_pb2.FileRequest(file_name=file_name,offset=offset)
 
   
     stream = client.DownloadFile(request)
@@ -42,7 +39,9 @@ def download_file(file_name):
                 break
 
             file.write(chunk.data)
-            print("Received chunk:", len(chunk.data), "bytes")
+            print(count,"downloaded")
+            count = count+1
+           
 
     except grpc.RpcError as e:
         print("Download failed:", e.details())

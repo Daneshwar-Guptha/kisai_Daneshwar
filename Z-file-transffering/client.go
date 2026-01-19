@@ -10,20 +10,26 @@ import (
 
 	pb "github.com/kdaneshwar/z-file-transferring/proto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
-	SERVER_ADDRESS = "192.168.0.229:50051"
+	SERVER_ADDRESS = "10.105.54.157:50051"
 )
 
-func downloadFile(fileName string, outputFile string) error {
+func downloadFile(fileName string, outputFile string,count int) error {
+	
 	offset := int64(0)
 	if info, err := os.Stat(outputFile); err == nil {
 		offset = info.Size()
-		fmt.Printf("Resuming download from byte %d\n", offset)
+		count= int(offset)/(3*1024*1024)
+		fmt.Printf(" %d is downloaded  Resuming download from byte %d\n", count,offset)
+		fmt.Println(offset/(3*1024*1024))
+		count= int(offset)/(3*1024*1024)
+
 	}
 
-	conn, err := grpc.Dial(SERVER_ADDRESS, grpc.WithInsecure())
+	conn, err := grpc.NewClient(SERVER_ADDRESS, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return fmt.Errorf("failed to connect: %v", err)
 	}
@@ -50,20 +56,33 @@ func downloadFile(fileName string, outputFile string) error {
 
 	for {
 		chunk, err := stream.Recv()
+		count = count+1;
+		 log.Println(count)
 		if err == io.EOF {
 			fmt.Println("Download completed")
 			break
 		}
 		if err != nil {
+		
 			return fmt.Errorf("error receiving chunk: %v", err)
 		}
 
-		if _, err := file.Write(chunk.Data); err != nil {
+		if _, err := file.Write(chunk.Data);
+	
+
+		
+		err != nil {
+			 log.Println(count)
 			return fmt.Errorf("error writing to file: %v", err)
+			
+			
 		}
+       
+       
 
 		if chunk.Eof {
 			fmt.Println("Download successful")
+			fmt.Println("total chunks was downloaded",count)
 			break
 		}
 	}
@@ -73,9 +92,10 @@ func downloadFile(fileName string, outputFile string) error {
 
 func main() {
 	fileName := "/mnt/c/Users/kdaneshwar/Documents/grpc-demo1/Demo/hello.proto"
-	outputFile := "fileTransfer.txt"
+	outputFile := "./files-2gb/file2.txt"
+	count:=0
 
-	if err := downloadFile(fileName, outputFile); err != nil {
+	if err := downloadFile(fileName, outputFile,count); err != nil {
 		log.Fatalf("Download failed: %v", err)
 	}
 }
