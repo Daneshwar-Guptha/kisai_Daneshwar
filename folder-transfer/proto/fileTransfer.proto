@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package filetransfer;
 
-//option go_package = "proto/filetransfer";
+option go_package = "./proto";
 
 service FileTransferService {
   rpc DownloadFolder(FolderRequest) returns (stream FileChunk);
