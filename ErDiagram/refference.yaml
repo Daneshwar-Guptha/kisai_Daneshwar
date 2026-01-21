@@ -1,0 +1,27 @@
+references:
+
+- parent: council.id
+  child: departments.council_id
+  type: onetomany
+  name: council_departments_reference
+
+
+
+- parent: departments.id
+  child: surgeons.id
+  type: manytomany
+  name: departments_surgeons_reference
+
+
+
+- parent: patients.id
+  child: opd.patient_id
+  type: onetoone
+  name: patients_opd_reference
+
+
+
+- parent: departments.id
+  child: opd.department_id
+  type: manytoone
+  name: opd_departments_reference

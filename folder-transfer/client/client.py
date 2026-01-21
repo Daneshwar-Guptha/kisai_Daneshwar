@@ -3,77 +3,97 @@ import grpc
 from proto import fileTransfer_pb2
 from proto import fileTransfer_pb2_grpc
 
-# import proto.fileTransfer_pb2_grpc as fileTransfer_pb2_grpc
 
-SERVER_ADDRESS = "localhost:50051"
-DOWNLOAD_DIR = "/mnt/c/Users/kdaneshwar/Documents/random_filesgb"
-SERVER_FOLDER = ""
-CHUNK_SIZE = 3 * 1024 * 1024  
+SERVER_ADDRESS = "10.18.226.157:50051"
+
+
+DOWNLOAD_DIR = "/mnt/c/Users/kdaneshwar/Documents/random_file_1gb_file"
+
+
+SERVER_FOLDER = "/mnt/c/Users/kdaneshwar/Documents/random_files1gb"
+
+CHUNK_SIZE = 3 * 1024 * 1024
 
 
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 
 def collect_progress(base_dir):
+   
     progress_list = []
+
     for root, dirs, files in os.walk(base_dir):
         for f in files:
             full_path = os.path.join(root, f)
             rel_path = os.path.relpath(full_path, base_dir)
-            progress_list.append({
-                "file_path":rel_path,
-                "offset":os.path.getsize(full_path)
-            })
+
+            progress_list.append(
+                fileTransfer_pb2.FileProgress(
+                    file_path=rel_path,
+                    offset=os.path.getsize(full_path)
+                )
+            )
+
     return progress_list
 
 
-channel = grpc.insecure_channel(SERVER_ADDRESS)
-client = fileTransfer_pb2_grpc.FileTransferServiceStub(channel)
+def main():
+    channel = grpc.insecure_channel(SERVER_ADDRESS)
+    client = fileTransfer_pb2_grpc.FileTransferServiceStub(channel)
 
-progress = collect_progress(DOWNLOAD_DIR)
+    progress = collect_progress(DOWNLOAD_DIR)
 
+   
+    request = fileTransfer_pb2.FolderRequest(
+        folder_path=SERVER_FOLDER,
+        progress=progress
+    )
 
-request ={
-   " file_path":SERVER_FOLDER,
-   " progress":progress
-}
+    open_files = {}
+    chunk_counter = {}
 
+    try:
+        stream = client.DownloadFolder(request)
 
-open_files = {}
-chunk_counter = {}
+        for chunk in stream:
+            if not chunk.file_path:
+                continue
 
-stream = client.DownloadFolder(request)
+            out_path = os.path.join(DOWNLOAD_DIR, chunk.file_path)
+            os.makedirs(os.path.dirname(out_path), exist_ok=True)
 
-try:
-    for chunk in stream:
-        if not chunk.file_path:
-            continue
+            if out_path not in open_files:
+                mode = "r+b" if os.path.exists(out_path) else "wb"
+                f = open(out_path, mode)
+                open_files[out_path] = f
+                chunk_counter[out_path] = 0
+                print(f"[CLIENT] Started file: {chunk.file_path}")
 
-        out_path = os.path.join(DOWNLOAD_DIR, chunk.file_path)
-        os.makedirs(os.path.dirname(out_path), exist_ok=True)
+            f = open_files[out_path]
 
-        if out_path not in open_files:
-           
-            f = open(out_path, "r+b") if os.path.exists(out_path) else open(out_path, "wb")
-            open_files[out_path] = f
-            chunk_counter[out_path] = 0
-            print(f"[CLIENT] Started file: {chunk.file_path}")
+            if chunk.data:
+                f.seek(chunk.offset)
+                f.write(chunk.data)
+                chunk_counter[out_path] += 1
+                print(
+                    f"[CLIENT] File={chunk.file_path} "
+                    f"Chunk={chunk_counter[out_path]} "
+                    f"Offset={chunk.offset} "
+                    f"Size={len(chunk.data)}"
+                )
 
-        f = open_files[out_path]
+            if chunk.eof:
+                f.close()
+                del open_files[out_path]
+                print(f"[CLIENT] Finished file: {chunk.file_path}")
 
-        if chunk.data:
-            f.seek(chunk.offset)
-            f.write(chunk.data)
-            chunk_counter[out_path] += 1
-            print(f"[CLIENT] File={chunk.file_path} Chunk={chunk_counter[out_path]} Offset={chunk.offset} Size={len(chunk.data)}")
+    except grpc.RpcError as e:
+        print(f"[CLIENT] gRPC Error: {e}")
 
-        if chunk.eof:
+    finally:
+        for f in open_files.values():
             f.close()
-            del open_files[out_path]
-            print(f"[CLIENT] Finished file: {chunk.file_path}")
 
-except grpc.RpcError as e:
-    print(f"[CLIENT] Error: {e}")
-finally:
-    for f in open_files.values():
-        f.close()
+
+if __name__ == "__main__":
+    main()

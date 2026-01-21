@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	DOWNLOAD_DIR = "/mnt/c/Users/kdaneshwar/Documents/random_filesgb"
+	DOWNLOAD_DIR = "/mnt/c/Users/kdaneshwar/Documents/random_file_1gb_file"
 )
 
 func collectProgress(base string) []*pb.FileProgress {
@@ -38,7 +38,7 @@ func main() {
 
 	log.Println("CLIENT Connecting to server")
 
-	conn, err := grpc.NewClient("10.33.8.157:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("10.18.226.157:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}

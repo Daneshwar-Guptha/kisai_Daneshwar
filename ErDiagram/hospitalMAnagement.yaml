@@ -1,0 +1,120 @@
+---
+entities:
+
+  - name: opd
+    description: patient_status
+    fields:
+      - name: doctor_id
+        type: int
+        validations:
+          required: true
+
+      - name: suggestion
+        type: string
+        validations:
+          required: true
+          minLength: 3
+
+      - name: test_status
+        type: int
+        enum:
+          1: pending
+          2: scheduled
+          3: in_progress
+          4: completed
+          5: cancelled
+        validations:
+          required: true
+
+
+  - name: departments
+    description: Hospital_departments information
+    fields:
+      - name: id
+        type: int
+        validations:
+          required: true
+          unique: true
+
+      - name: shift
+        type: string
+        enum:
+          - morning
+          - evening
+          - night
+        validations:
+          required: true
+
+      - name: has_surgeons
+        type: boolean
+        default: false
+
+      - name: operation_chamber_available
+        type: boolean
+        default: false
+
+
+  - name: patients
+    description: Patient_data
+    fields:
+      - name: id
+        type: int
+        validations:
+          required: true
+          unique: true
+
+      - name: details
+        type: string
+        validations:
+          required: true
+          minLength: 5
+
+      - name: cause
+        type: string
+        validations:
+          required: true
+
+      - name: seriousness_level
+        type: int
+        enum:
+          1: low
+          2: medium
+          3: high
+          4: critical
+        validations:
+          required: true
+
+
+  - name: surgeons
+    description: Surgeon_profiles
+    fields:
+      - name: id
+        type: int
+        validations:
+          required: true
+          unique: true
+
+      - name: experience_years
+        type: int
+        validations:
+          min: 0
+
+      - name: number_of_operations
+        type: int
+        validations:
+          min: 0
+
+      - name: success_rate
+        type: float
+        validations:
+          min: 0
+          max: 100
+
+      - name: department_id
+        type: int
+        relations:
+          references: departments.id
+
+      - name: council_member
+        type: boolean
+        default: false

@@ -19,7 +19,7 @@ const client = new proto.FileTransferService(
   grpc.credentials.createInsecure()
 );
 
-const DOWNLOAD_DIR = "/mnt/c/Users/kdaneshwar/Documents/random_filesgb";
+const DOWNLOAD_DIR = "/mnt/c/Users/kdaneshwar/Documents/random_file_1gb_file";
 const SERVER_FOLDER = "";
 
 
